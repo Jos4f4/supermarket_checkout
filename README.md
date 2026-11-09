@@ -81,14 +81,3 @@ O sistema conta com 6 cenários de teste principais para homologação ao vivo:
 4. Selecione a pasta clonada do repositório `supermarket_checkout`.
 5. Abra o arquivo `CheckoutFrame.java` (em `src/com/mercadinho/checkout/view/`).
 6. Clique com o botão direito $\rightarrow$ **Run As > Java Application**.
-
----
-
-## 👥 Equipe do Trabalho
-
-Trabalho desenvolvido para a disciplina de **Engenharia de Software I**.
-
-* Josafá e Grupo de Engenharia de Software.
-
----
-*Mercadinho São Francisco — Do problema ao programa em uma semana.* 🛒
