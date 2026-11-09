@@ -1,0 +1,27 @@
+# Eclipse metadata files
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.dat
+*.user
+*.prefs
+.settings/
+.loadpath
+.recommenders/
+
+# Eclipse project files
+.project
+.classpath
+
+# External history & build output
+/build/
+/target/
+
+# Log files
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
