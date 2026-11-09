@@ -108,9 +108,3 @@ The following features are intentionally deferred for future releases:
 - Electronic Fiscal Note Printing (NFC-e / SAT)
 - Barcode Scanner Hardware Integration
 - Persistent Database Integration (Database Server / SQL)
-
----
-
-## 👥 Contributors
-
-- **Team Members**: Software Engineering I — Group Project
