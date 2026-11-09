@@ -1,8 +1,5 @@
 # 🛒 Supermarket Checkout System (`supermarket_checkout`)
 
-> **Frente de Caixa do Mercadinho São Francisco**  
-> *Software Engineering I — Group Project*
-
 ---
 
 ## 📌 About the Project
@@ -32,15 +29,12 @@ The project follows a clean **Model-View-Controller (MVC)** design pattern, keep
 
 ```
 src/
-└── com/
-    └── mercadinho/
-        └── checkout/
-            ├── model/
-            │   ├── Product.java         # Product entity (price stored in cents)
-            │   ├── Customer.java        # Registered store credit customer & limits
-            │   └── CartItem.java        # Quantity and subtotal calculations
-            └── view/
-                └── CheckoutFrame.java   # Swing graphical user interface & listeners
+ ├── model/
+ │   ├── Product.java         # Product entity (price stored in cents)
+ │   ├── Customer.java        # Registered store credit customer & limits
+ │   └── CartItem.java        # Quantity and subtotal calculations
+ └── view/
+     └── CheckoutFrame.java   # Swing graphical user interface & listeners
 ```
 
 > **Note on Financial Accuracy**: To avoid floating-point rounding errors (e.g., `0.1 + 0.2 = 0.30000000000000004`), all monetary calculations are performed and stored internally as **integer cents** (`long`). Formatted currency displays values in Brazilian Real (`R$`).
