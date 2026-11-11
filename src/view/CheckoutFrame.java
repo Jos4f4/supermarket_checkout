@@ -6,6 +6,12 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +38,10 @@ public class CheckoutFrame extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
+    // Output directory and filename for sales history
+    private static final String SALES_DIR_PATH = "sales_history";
+    private static final String SALES_FILE_PATH = SALES_DIR_PATH + File.separator + "sales_log.txt";
+
     // UI Components (English Naming)
     private JTextField productCodeField;
     private JTextField quantityField;
@@ -54,9 +64,17 @@ public class CheckoutFrame extends JFrame {
 
     public CheckoutFrame() {
         super("Mercadinho São Francisco - Frente de Caixa (MVP)");
+        ensureSalesDirectoryExists();
         loadMockData();
         configureWindow();
         initializeComponents();
+    }
+
+    private void ensureSalesDirectoryExists() {
+        File salesDir = new File(SALES_DIR_PATH);
+        if (!salesDir.exists()) {
+            salesDir.mkdirs();
+        }
     }
 
     private void loadMockData() {
@@ -211,6 +229,8 @@ public class CheckoutFrame extends JFrame {
         }
 
         String paymentMethod = (String) paymentMethodComboBox.getSelectedItem();
+        long changeInCents = 0;
+        String extraInfo = "";
 
         if ("DINHEIRO".equals(paymentMethod)) {
             try {
@@ -222,9 +242,10 @@ public class CheckoutFrame extends JFrame {
                     return;
                 }
 
-                long changeInCents = paidAmountInCents - totalSaleInCents;
+                changeInCents = paidAmountInCents - totalSaleInCents;
                 changeAmountLabel.setText(String.format("Troco: R$ %s", formatCurrency(changeInCents)));
                 accumulatedCashInCents += totalSaleInCents;
+                extraInfo = "Pago: R$ " + formatCurrency(paidAmountInCents) + " | Troco: R$ " + formatCurrency(changeInCents);
 
                 JOptionPane.showMessageDialog(this, "Venda em Dinheiro Finalizada!\nTroco: R$ " + formatCurrency(changeInCents));
             } catch (NumberFormatException ex) {
@@ -234,6 +255,7 @@ public class CheckoutFrame extends JFrame {
         } else if ("CARTAO".equals(paymentMethod)) {
             accumulatedCardInCents += totalSaleInCents;
             changeAmountLabel.setText("Troco: R$ 0,00");
+            extraInfo = "Pagamento via Cartão";
             JOptionPane.showMessageDialog(this, "Venda no Cartão Finalizada!");
         } else if ("FIADO".equals(paymentMethod)) {
             String customerCpf = paymentInputField.getText().trim();
@@ -257,15 +279,54 @@ public class CheckoutFrame extends JFrame {
             customer.deductTabCredit(totalSaleInCents);
             accumulatedTabInCents += totalSaleInCents;
             changeAmountLabel.setText("Troco: R$ 0,00");
+            extraInfo = "Cliente: " + customer.getName() + " (CPF: " + customerCpf + ") | Novo Limite: R$ " + formatCurrency(customer.getTabCreditLimitInCents());
+
             JOptionPane.showMessageDialog(
                 this, 
                 "Venda Fiado Autorizada!\nNovo Limite do Cliente: R$ " + formatCurrency(customer.getTabCreditLimitInCents())
             );
         }
 
+        // Persist sale into sales_history/sales_log.txt
+        saveSaleToLogFile(paymentMethod, totalSaleInCents, extraInfo);
+
         currentCartItems.clear();
         refreshTable();
         paymentInputField.setText("");
+    }
+
+    private void saveSaleToLogFile(String paymentMethod, long totalSaleInCents, String extraInfo) {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        try (FileWriter fw = new FileWriter(SALES_FILE_PATH, true);
+             PrintWriter pw = new PrintWriter(fw)) {
+
+            pw.println("--------------------------------------------------");
+            pw.println("DATA/HORA: " + timestamp);
+            pw.println("FORMA DE PAGAMENTO: " + paymentMethod);
+            pw.println("ITENS DA COMPRA:");
+            for (CartItem item : currentCartItems) {
+                pw.printf("  - [%s] %s x%d -> R$ %s%n",
+                    item.getProduct().getCode(),
+                    item.getProduct().getName(),
+                    item.getQuantity(),
+                    formatCurrency(item.getSubtotalInCents())
+                );
+            }
+            pw.println("TOTAL DA VENDA: R$ " + formatCurrency(totalSaleInCents));
+            if (!extraInfo.isEmpty()) {
+                pw.println("OBSERVAÇÕES: " + extraInfo);
+            }
+            pw.println("--------------------------------------------------\n");
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(
+                this, 
+                "Erro ao salvar o histórico de vendas no arquivo: " + e.getMessage(), 
+                "Erro de Persistência", 
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 
     private void handleDailySummary(ActionEvent event) {
@@ -276,11 +337,13 @@ public class CheckoutFrame extends JFrame {
             "Total em Cartão:   R$ %s\n" +
             "Total em Fiado:    R$ %s\n" +
             "-----------------------------\n" +
-            "TOTAL VENDIDO:     R$ %s",
+            "TOTAL VENDIDO:     R$ %s\n\n" +
+            "Histórico salvo em: %s",
             formatCurrency(accumulatedCashInCents),
             formatCurrency(accumulatedCardInCents),
             formatCurrency(accumulatedTabInCents),
-            formatCurrency(totalDaySalesInCents)
+            formatCurrency(totalDaySalesInCents),
+            SALES_FILE_PATH
         );
 
         JOptionPane.showMessageDialog(this, summaryMessage, "Fechamento do Dia", JOptionPane.INFORMATION_MESSAGE);
