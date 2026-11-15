@@ -38,11 +38,10 @@ public class CheckoutFrame extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    // Output directory and filename for sales history
     private static final String SALES_DIR_PATH = "sales_history";
     private static final String SALES_FILE_PATH = SALES_DIR_PATH + File.separator + "sales_log.txt";
 
-    // UI Components (English Naming)
+    // UI Components
     private JTextField productCodeField;
     private JTextField quantityField;
     private JTextField paymentInputField;
@@ -92,6 +91,11 @@ public class CheckoutFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
+
+        java.net.URL iconUrl = getClass().getResource("/images/logo.png");
+        if (iconUrl != null) {
+            setIconImage(new javax.swing.ImageIcon(iconUrl).getImage());
+        }
     }
 
     private void initializeComponents() {
@@ -358,6 +362,9 @@ public class CheckoutFrame extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new CheckoutFrame().setVisible(true));
+    	SwingUtilities.invokeLater(() -> {
+            SplashScreenWindow splash = new SplashScreenWindow();
+            splash.startLoadingAndLaunchMainApp();
+        });
     }
 }
