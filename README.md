@@ -30,11 +30,15 @@ The project follows a clean **Model-View-Controller (MVC)** design pattern, keep
 ```
 src/
  ├── model/
- │   ├── Product.java         # Product entity (price stored in cents)
- │   ├── Customer.java        # Registered store credit customer & limits
- │   └── CartItem.java        # Quantity and subtotal calculations
- └── view/
-     └── CheckoutFrame.java   # Swing graphical user interface & listeners
+ │   ├── Product.java               # Product entity (price stored in cents)
+ │   ├── Customer.java              # Registered store credit customer & limits
+ │   └── CartItem.java              # Quantity and subtotal calculations
+ ├── view/
+ │   ├── CheckoutFrame.java         # Swing graphical user interface & listeners
+ │   ├── LoginFrame.java            # Screen Login in the initialize system
+ │   └── SplashScreenWindow.java    # Smow frame, like SAP system.
+ └── images/
+     └── logo.png                   # Logo of 'Mercadinho São Franciso'. This image was generated with Chat GPT AI
 ```
 
 > **Note on Financial Accuracy**: To avoid floating-point rounding errors (e.g., `0.1 + 0.2 = 0.30000000000000004`), all monetary calculations are performed and stored internally as **integer cents** (`long`). Formatted currency displays values in Brazilian Real (`R$`).
